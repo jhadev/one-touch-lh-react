@@ -10,6 +10,7 @@ class Site {
   constructor(name, url) {
     this.name = name;
     this.url = url;
+    this.checked = false;
     this.id = createId(this.name);
   }
 }
