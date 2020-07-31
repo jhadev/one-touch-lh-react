@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, Suspense } from 'react';
 import {
   Flex,
   Box,
@@ -21,6 +21,7 @@ import { client } from '../utils/API';
 
 const Layout = (props) => {
   const [checkedItems, setCheckedItems] = useState(siteList);
+  const [isLoading, setIsLoading] = useState(false);
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
@@ -59,6 +60,7 @@ const Layout = (props) => {
   };
 
   const handleSubmit = async () => {
+    setSummary(null);
     const sitesToTest = checkedItems
       .filter((site) => site.checked)
       .map((site) => site.url);
@@ -66,6 +68,8 @@ const Layout = (props) => {
     console.log(sitesToTest);
     const response = await postToLH(sitesToTest);
     console.log(response);
+
+    setSummary(response);
   };
 
   return (
@@ -107,6 +111,17 @@ const Layout = (props) => {
       <Heading textAlign="center" m={1} as="h1" size="2xl">
         one touch lighthouse
       </Heading>
+      <Flex my={3} align="center" direction="column">
+        {summary ? (
+          <pre>
+            <code>{JSON.stringify(summary, null, 2)}</code>
+          </pre>
+        ) : (
+          <Heading textAlign="center" m={1} as="h2" size="xl">
+            waiting... be patient
+          </Heading>
+        )}
+      </Flex>
     </div>
   );
 };
