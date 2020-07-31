@@ -17,9 +17,24 @@ import {
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
 import { siteList } from '../utils/siteList';
+import { client } from '../utils/API';
 
 const Layout = (props) => {
   const [checkedItems, setCheckedItems] = useState(siteList);
+  const [summary, setSummary] = useState(null);
+
+  useEffect(() => {
+    async function getSummary() {
+      try {
+        const data = await client('api/summary');
+        setSummary(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getSummary();
+  }, []);
 
   const handleCheckedItems = (e) => {
     const { name } = e.target;
