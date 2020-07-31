@@ -36,6 +36,14 @@ const Layout = (props) => {
     getSummary();
   }, []);
 
+  const postToLH = async (sites) => {
+    try {
+      return await client('api/lh', { body: { sites } });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleCheckedItems = (e) => {
     const { name } = e.target;
 
@@ -50,12 +58,14 @@ const Layout = (props) => {
     setCheckedItems(updatedList);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const sitesToTest = checkedItems
       .filter((site) => site.checked)
       .map((site) => site.url);
 
     console.log(sitesToTest);
+    const response = await postToLH(sitesToTest);
+    console.log(response);
   };
 
   return (
