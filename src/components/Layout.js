@@ -4,8 +4,6 @@ import {
   Box,
   Text,
   Button,
-  Radio,
-  RadioGroup,
   Image,
   Heading,
   SimpleGrid,
@@ -13,6 +11,7 @@ import {
   Link,
   Checkbox,
   CheckboxGroup,
+  Spinner,
 } from '@chakra-ui/core';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
@@ -21,20 +20,19 @@ import { client } from '../utils/API';
 
 const Layout = (props) => {
   const [checkedItems, setCheckedItems] = useState(siteList);
-  const [isLoading, setIsLoading] = useState(false);
-  const [summary, setSummary] = useState(null);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    async function getSummary() {
+    async function getStats() {
       try {
         const data = await client('api/summary');
-        setSummary(data);
+        setStats(data);
       } catch (err) {
         console.log(err);
       }
     }
 
-    getSummary();
+    getStats();
   }, []);
 
   const postToLH = async (sites) => {
@@ -60,16 +58,47 @@ const Layout = (props) => {
   };
 
   const handleSubmit = async () => {
-    setSummary(null);
     const sitesToTest = checkedItems
       .filter((site) => site.checked)
       .map((site) => site.url);
 
     console.log(sitesToTest);
+    if (!sitesToTest.length) {
+      return alert('no tests selected');
+    }
+    setStats(null);
     const response = await postToLH(sitesToTest);
     console.log(response);
 
-    setSummary(response);
+    setStats(response);
+  };
+
+  const writeStats = () => {
+    const { summary, path } = stats;
+
+    if (summary.length) {
+      const results = summary.map((site) => {
+        return {
+          url: site.url,
+          name: site.name,
+          score: site.detail.performance * 100,
+        };
+      });
+
+      return (
+        <div>
+          {results.map(({ url, name, score }) => {
+            return (
+              <div key={url}>
+                <h4>{name}</h4>
+                <h4>{url}</h4>
+                <h4>{score}</h4>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
   };
 
   return (
@@ -111,15 +140,31 @@ const Layout = (props) => {
       <Heading textAlign="center" m={1} as="h1" size="2xl">
         one touch lighthouse
       </Heading>
-      <Flex my={3} align="center" direction="column">
-        {summary ? (
-          <pre>
-            <code>{JSON.stringify(summary, null, 2)}</code>
-          </pre>
+      <Flex my={3} direction="column" justify="center">
+        {stats ? (
+          <>
+            <Flex direction="row" justify="center">
+              <pre>
+                <code>{JSON.stringify(stats, null, 2)}</code>
+              </pre>
+
+              {writeStats()}
+            </Flex>
+          </>
         ) : (
-          <Heading textAlign="center" m={1} as="h2" size="xl">
-            waiting... be patient
-          </Heading>
+          <>
+            <Heading textAlign="center" m={1} as="h2" size="xl">
+              waiting... be patient
+            </Heading>
+            <Spinner
+              my={5}
+              thickness="4px"
+              speed="1s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
+          </>
         )}
       </Flex>
     </div>
