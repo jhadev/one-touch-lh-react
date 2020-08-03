@@ -9297,6 +9297,11 @@ react-layout-effect@^1.0.1:
   resolved "https://registry.yarnpkg.com/react-layout-effect/-/react-layout-effect-1.0.5.tgz#0dc4e24452aee5de66c93c166f0ec512dfb1be80"
   integrity sha512-zdRXHuch+OBHU6bvjTelOGUCM+UDr/iCY+c0wXLEAc+G4/FlcJruD/hUOzlKH5XgO90Y/BUJPNhI/g9kl+VAsA==
 
+react-lighthouse-viewer@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/react-lighthouse-viewer/-/react-lighthouse-viewer-6.0.2.tgz#da5089ee32248f86e2d777c690d1ab01b8a1fe6f"
+  integrity sha512-sr4uYN9pnN50tTfpFHNXHoSWoaSVTAXsO5X+T0ojR0iCUtfT39ZRFQvL2u89w7p40yob3baDZtBIMouStK/ycg==
+
 react-popper@1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-1.3.3.tgz#2c6cef7515a991256b4f0536cd4bdcb58a7b6af6"

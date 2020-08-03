@@ -13,6 +13,7 @@ import {
   CheckboxGroup,
   Spinner,
 } from '@chakra-ui/core';
+import ReportViewer from 'react-lighthouse-viewer';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
 import { siteList } from '../utils/siteList';
@@ -21,11 +22,13 @@ import { client } from '../utils/API';
 const Layout = (props) => {
   const [checkedItems, setCheckedItems] = useState(siteList);
   const [stats, setStats] = useState(null);
+  const [jsonReports, setjsonReports] = useState([]);
 
   useEffect(() => {
     async function getStats() {
       try {
         const data = await client('api/summary');
+
         setStats(data);
       } catch (err) {
         console.log(err);
@@ -34,6 +37,22 @@ const Layout = (props) => {
 
     getStats();
   }, []);
+
+  useEffect(() => {
+    async function getJsonReports() {
+      try {
+        let data = await client('api/json-reports');
+        console.log(data.length);
+        setjsonReports(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    if (stats) {
+      getJsonReports();
+    }
+  }, [stats]);
 
   const postToLH = async (sites) => {
     try {
@@ -148,7 +167,12 @@ const Layout = (props) => {
                 <code>{JSON.stringify(stats, null, 2)}</code>
               </pre>
 
-              {writeStats()}
+              {jsonReports.length &&
+                jsonReports.map((report, i) => (
+                  <Fragment key={i}>
+                    <ReportViewer json={report} />
+                  </Fragment>
+                ))}
             </Flex>
           </>
         ) : (
