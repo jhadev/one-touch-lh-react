@@ -42,6 +42,7 @@ const Layout = (props) => {
     async function getJsonReports() {
       try {
         let data = await client('api/json-reports');
+        console.log(data);
         console.log(data.length);
         setjsonReports(data);
       } catch (err) {
@@ -159,20 +160,23 @@ const Layout = (props) => {
       <Heading textAlign="center" m={1} as="h1" size="2xl">
         one touch lighthouse
       </Heading>
-      <Flex my={3} direction="column" justify="center">
+      <Flex my={3} justify="center">
         {stats ? (
           <>
-            <Flex direction="row" justify="center">
-              <pre>
-                <code>{JSON.stringify(stats, null, 2)}</code>
-              </pre>
+            <pre>
+              <code>{JSON.stringify(stats, null, 2)}</code>
+            </pre>
 
+            <Flex direction="column" justify="center">
               {jsonReports.length &&
-                jsonReports.map((report, i) => (
-                  <Fragment key={i}>
-                    <ReportViewer json={report} />
-                  </Fragment>
-                ))}
+                jsonReports.map((report, i) => {
+                  report = JSON.parse(report);
+                  return (
+                    <div key={i}>
+                      <ReportViewer json={report} />
+                    </div>
+                  );
+                })}
             </Flex>
           </>
         ) : (
