@@ -1,5 +1,3 @@
-const URL = `http://localhost:3001/`;
-
 function client(endpoint, { body, ...customConfig } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   const config = {
@@ -24,21 +22,5 @@ function client(endpoint, { body, ...customConfig } = {}) {
       }
     });
 }
-
-const getSummary = async () => {
-  try {
-    return await client('summary');
-  } catch (err) {
-    return console.log(err);
-  }
-};
-
-// const postForLH = async (body) => {
-//   try {
-//     return await client('lh', { body: { sites } });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
 
 export { client };

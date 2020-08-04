@@ -8,52 +8,34 @@ import {
   Heading,
   SimpleGrid,
   Stack,
-  Link,
   Checkbox,
   CheckboxGroup,
   Spinner,
 } from '@chakra-ui/core';
+import { Link } from 'react-router-dom';
 import ReportViewer from 'react-lighthouse-viewer';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
+import { useGlobalState } from '../components/Global';
 import { siteList } from '../utils/siteList';
 import { client } from '../utils/API';
 
 const Layout = (props) => {
-  const [checkedItems, setCheckedItems] = useState(siteList);
-  const [stats, setStats] = useState(null);
-  const [jsonReports, setjsonReports] = useState([]);
+  const [{ checkedItems, stats, jsonReports }, dispatch] = useGlobalState();
 
   useEffect(() => {
     async function getStats() {
       try {
         const data = await client('api/summary');
 
-        setStats(data);
+        dispatch({ type: 'SET_STATS', stats: data });
       } catch (err) {
         console.log(err);
       }
     }
 
     getStats();
-  }, []);
-
-  useEffect(() => {
-    async function getJsonReports() {
-      try {
-        let data = await client('api/json-reports');
-        console.log(data);
-        console.log(data.length);
-        setjsonReports(data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    if (stats) {
-      getJsonReports();
-    }
-  }, [stats]);
+  }, [dispatch]);
 
   const postToLH = async (sites) => {
     try {
@@ -74,7 +56,7 @@ const Layout = (props) => {
       return item;
     });
 
-    setCheckedItems(updatedList);
+    dispatch({ type: 'SET_CHECKED_ITEMS', checkedItems: updatedList });
   };
 
   const handleSubmit = async () => {
@@ -86,40 +68,40 @@ const Layout = (props) => {
     if (!sitesToTest.length) {
       return alert('no tests selected');
     }
-    setStats(null);
+    dispatch({ type: 'SET_STATS', stats: null });
     const response = await postToLH(sitesToTest);
     console.log(response);
 
-    setStats(response);
+    dispatch({ type: 'SET_STATS', stats: response });
   };
 
-  const writeStats = () => {
-    const { summary, path } = stats;
+  // const writeStats = () => {
+  //   const { summary, path } = stats;
 
-    if (summary.length) {
-      const results = summary.map((site) => {
-        return {
-          url: site.url,
-          name: site.name,
-          score: site.detail.performance * 100,
-        };
-      });
+  //   if (summary.length) {
+  //     const results = summary.map((site) => {
+  //       return {
+  //         url: site.url,
+  //         name: site.name,
+  //         score: site.detail.performance * 100,
+  //       };
+  //     });
 
-      return (
-        <div>
-          {results.map(({ url, name, score }) => {
-            return (
-              <div key={url}>
-                <h4>{name}</h4>
-                <h4>{url}</h4>
-                <h4>{score}</h4>
-              </div>
-            );
-          })}
-        </div>
-      );
-    }
-  };
+  //     return (
+  //       <div>
+  //         {results.map(({ url, name, score }) => {
+  //           return (
+  //             <div key={url}>
+  //               <h4>{name}</h4>
+  //               <h4>{url}</h4>
+  //               <h4>{score}</h4>
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
+  //     );
+  //   }
+  // };
 
   return (
     <div>
@@ -160,39 +142,41 @@ const Layout = (props) => {
       <Heading textAlign="center" m={1} as="h1" size="2xl">
         one touch lighthouse
       </Heading>
-      <Flex my={3} justify="center">
+      <Flex my={3} direction="row" justify="center">
         {stats ? (
-          <>
-            <pre>
-              <code>{JSON.stringify(stats, null, 2)}</code>
-            </pre>
-
-            <Flex direction="column" justify="center">
-              {jsonReports.length &&
-                jsonReports.map((report, i) => {
-                  report = JSON.parse(report);
-                  return (
-                    <div key={i}>
-                      <ReportViewer json={report} />
-                    </div>
-                  );
-                })}
+          <div>
+            <Flex direction="column" justify="center" align="center">
+              {stats.summary.map(({ url }) => {
+                url = url.slice(8);
+                return (
+                  <div key={url}>
+                    <Link to={`/${url}`}>{url}</Link>
+                  </div>
+                );
+              })}
             </Flex>
-          </>
+            <Flex direction="column" justify="center" align="center">
+              <pre>
+                <code>{JSON.stringify(stats, null, 2)}</code>
+              </pre>
+            </Flex>
+          </div>
         ) : (
-          <>
+          <Flex justify="center" align="center" direction="column">
             <Heading textAlign="center" m={1} as="h2" size="xl">
               waiting... be patient
             </Heading>
-            <Spinner
-              my={5}
-              thickness="4px"
-              speed="1s"
-              emptyColor="gray.200"
-              color="blue.500"
-              size="xl"
-            />
-          </>
+            <div>
+              <Spinner
+                my={5}
+                thickness="4px"
+                speed="1s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="xl"
+              />
+            </div>
+          </Flex>
         )}
       </Flex>
     </div>
