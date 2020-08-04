@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReportViewer from 'react-lighthouse-viewer';
 import { useGlobalState } from '../components/Global';
 import { client } from '../utils/API';
+import { convertURL } from '../utils/convertURL';
 
 const Report = ({ match }) => {
   const [{ jsonReports }, dispatch] = useGlobalState();
@@ -17,8 +18,8 @@ const Report = ({ match }) => {
         const matchedReport = data.find((report) => {
           report.requestedUrl = report.requestedUrl.slice(8);
           report.requestedUrl = report.requestedUrl.slice(0, -1);
-          console.log(report.requestedUrl);
-          return report.requestedUrl === match.params.id;
+          const convertedURL = convertURL(report.requestedUrl, '/', '_');
+          return convertedURL === match.params.id;
         });
         console.log(matchedReport);
         setlhJson(matchedReport);

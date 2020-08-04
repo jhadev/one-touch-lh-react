@@ -18,6 +18,7 @@ import NavDrawer from './NavDrawer';
 import { useGlobalState } from '../components/Global';
 import { siteList } from '../utils/siteList';
 import { client } from '../utils/API';
+import { convertURL } from '../utils/convertURL';
 
 const Layout = (props) => {
   const [{ checkedItems, stats, jsonReports }, dispatch] = useGlobalState();
@@ -147,9 +148,11 @@ const Layout = (props) => {
             <Flex direction="column" justify="center" align="center">
               {stats.summary.map(({ url }) => {
                 url = url.slice(8);
+                url = url.endsWith('/') ? url.slice(0, -1) : url;
+                url = convertURL(url, '/', '_');
                 return (
                   <div key={url}>
-                    <Link to={`/${url}`}>{url}</Link>
+                    <Link to={`/${url}`}>{convertURL(url, '_', '/')}</Link>
                   </div>
                 );
               })}
