@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, Suspense } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import {
   Flex,
   Box,
@@ -13,7 +13,6 @@ import {
   Spinner,
 } from '@chakra-ui/core';
 import { Link } from 'react-router-dom';
-import ReportViewer from 'react-lighthouse-viewer';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
 import { useGlobalState } from '../components/Global';
