@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {
   Flex,
   Box,
@@ -13,6 +13,7 @@ import {
   Spinner,
 } from '@chakra-ui/core';
 import { Link } from 'react-router-dom';
+import Countdown from 'react-countdown';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
 import { useGlobalState } from '../components/Global';
@@ -22,6 +23,7 @@ import { convertURL } from '../utils/convertURL';
 
 const Layout = (props) => {
   const [{ checkedItems, stats, jsonReports }, dispatch] = useGlobalState();
+  const [lhTimeout, setlhTimeout] = useState(false);
 
   useEffect(() => {
     async function getStats() {
@@ -37,11 +39,27 @@ const Layout = (props) => {
     getStats();
   }, [dispatch]);
 
+  // Renderer callback with condition
+  const renderer = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+      // Render a completed state
+      window.location.reload();
+    } else {
+      // Render a countdown
+      return (
+        <h3>
+          {minutes}:{seconds}
+        </h3>
+      );
+    }
+  };
+
   const postToLH = async (sites) => {
     try {
       return await client('api/lh', { body: { sites } });
     } catch (err) {
       console.log(err);
+      setlhTimeout(true);
     }
   };
 
@@ -166,7 +184,9 @@ const Layout = (props) => {
         ) : (
           <Flex justify="center" align="center" direction="column">
             <Heading textAlign="center" m={1} as="h2" size="xl">
-              waiting... be patient
+              {!lhTimeout
+                ? 'waiting... be patient'
+                : 'Fetch failed... wait for page to reload'}
             </Heading>
             <div>
               <Spinner
@@ -178,6 +198,9 @@ const Layout = (props) => {
                 size="xl"
               />
             </div>
+            {lhTimeout && (
+              <Countdown date={Date.now() + 120000} renderer={renderer} />
+            )}
           </Flex>
         )}
       </Flex>
