@@ -13,7 +13,7 @@ import {
   Spinner,
 } from '@chakra-ui/core';
 import { Link } from 'react-router-dom';
-import Countdown from 'react-countdown';
+import Countdown, { zeroPad } from 'react-countdown';
 import ToggleColorMode from './ToggleColorMode';
 import NavDrawer from './NavDrawer';
 import { useGlobalState } from '../components/Global';
@@ -47,9 +47,9 @@ const Layout = (props) => {
     } else {
       // Render a countdown
       return (
-        <h3>
-          {minutes}:{seconds}
-        </h3>
+        <Heading textAlign="center" m={1} as="h3" size="xl">
+          {minutes}:{zeroPad(seconds)}
+        </Heading>
       );
     }
   };
